@@ -3,8 +3,17 @@
 # This class configures parameters for the puppet-dashboard module.
 #
 # Parameters:
-#   [*dashboard_site*]  - The ServerName setting for Apache
-#   [*dashboard_port*]  - The port on which puppet-dashboard should run
+#   [*dashboard_site*]
+#     - The ServerName setting for Apache
+#
+#   [*dashboard_port*]
+#     - The port on which puppet-dashboard should run
+#
+#   [*dashboard_config*]
+#     - The Dashboard configuration file
+#
+#   [*dashboard_root*]
+#     - The path to the Puppet Dashboard library
 #
 # Actions:
 #
@@ -15,8 +24,8 @@
 class dashboard::passenger (
   $dashboard_site,
   $dashboard_port,
-  $dashboard_config = $dashboard::params::dashboard_config,
-  $dashboard_root   = $dashboard::params::dashboard_root,
+  $dashboard_config,
+  $dashboard_root
 ) inherits dashboard {
 
   include apache

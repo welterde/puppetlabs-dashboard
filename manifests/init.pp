@@ -3,22 +3,54 @@
 # This class installs and configures parameters for Puppet Dashboard
 #
 # Parameters:
-#   [*dashboard_ensure*]      - The value of the ensure parameter for the
-#                               puppet-dashboard package
-#   [*dashboard_user*]        - Name of the puppet-dashboard database and
-#                               system user
-#   [*dashboard_group*]       - Name of the puppet-dashboard group
-#   [*dashbaord_password*]    - Password for the puppet-dashboard database use
-#   [*dashboard_db*]          - The puppet-dashboard database name
-#   [*dashboard_charset*]     - Character set for the puppet-dashboard database
-#   [*dashboard_site*]        - The ServerName setting for Apache
-#   [*dashboard_port*]        - The port on which puppet-dashboard should run
-#   [*mysql_root_pw*]         - Password for root on MySQL
-#   [*passenger*]             - Boolean to determine whether Dashboard is to be
-#                               used with Passenger
-#   [*mysql_package_provider*] - The package provider to use when installing
-#                               the ruby-mysql package
-#   [*ruby_mysql_package*]     - The package name for the ruby-mysql package
+#   [*dashboard_ensure*]
+#     - The value of the ensure parameter for the
+#       puppet-dashboard package
+#
+#   [*dashboard_user*]
+#     - Name of the puppet-dashboard database and
+#       system user
+#
+#   [*dashboard_group*]
+#     - Name of the puppet-dashboard group
+#
+#   [*dashbaord_password*]
+#     - Password for the puppet-dashboard database use
+#
+#   [*dashboard_db*]
+#     - The puppet-dashboard database name
+#
+#   [*dashboard_charset*]
+#     - Character set for the puppet-dashboard database
+#
+#   [*dashboard_site*]
+#     - The ServerName setting for Apache
+#
+#   [*dashboard_port*]
+#     - The port on which puppet-dashboard should run
+#
+#   [*mysql_root_pw*]
+#     - Password for root on MySQL
+#
+#   [*passenger*]
+#     - Boolean to determine whether Dashboard is to be
+#       used with Passenger
+#
+#   [*mysql_package_provider*]
+#     - The package provider to use when installing
+#       the ruby-mysql package
+#
+#   [*ruby_mysql_package*]
+#     - The package name for the ruby-mysql package
+#
+#   [*dashboard_config*]
+#     - The Dashboard configuration file
+#
+#   [*dashboard_root*]
+#     - The path to the Puppet Dashboard library
+#
+#   [*rack_version*]
+#     - The version of the rack gem to install
 #
 # Actions:
 #
@@ -30,18 +62,16 @@
 #
 # Sample Usage:
 #   class {'dashboard':
-#     dashboard_ensure          => 'present',
-#     dashboard_user            => 'puppet-dbuser',
-#     dashboard_group           => 'puppet-dbgroup',
-#     dashboard_password        => 'changemme',
-#     dashboard_db              => 'dashboard_prod',
-#     dashboard_charset         => 'utf8',
-#     dashboard_site            => $fqdn,
-#     dashboard_port            => '8080',
-#     mysql_root_pw             => 'REALLY_change_me',
-#     passenger                 => true,
-#     mysql_package_provider    => 'yum',
-#     ruby_mysql_package        => 'ruby-mysql',
+#     dashboard_ensure       => 'present',
+#     dashboard_user         => 'puppet-dbuser',
+#     dashboard_group        => 'puppet-dbgroup',
+#     dashboard_password     => 'changemme',
+#     dashboard_db           => 'dashboard_prod',
+#     dashboard_charset      => 'utf8',
+#     dashboard_site         => $fqdn,
+#     dashboard_port         => '8080',
+#     mysql_root_pw          => 'REALLY_change_me',
+#     passenger              => true,
 #   }
 #
 #  Note: SELinux on Redhat needs to be set separately to allow access to the
@@ -60,16 +90,19 @@ class dashboard (
   $mysql_root_pw            = $dashboard::params::mysql_root_pw,
   $passenger                = $dashboard::params::passenger,
   $mysql_package_provider   = $dashboard::params::mysql_package_provider,
-  $ruby_mysql_package       = $dashboard::params::ruby_mysql_package
+  $ruby_mysql_package       = $dashboard::params::ruby_mysql_package,
+  $dashboard_config         = $dashboard::params::dashboard_config,
+  $dashboard_root           = $dashboard::params::dashboard_root,
+  $rack_version             = $dashboard::params::rack_version
 ) inherits dashboard::params {
 
-  class { 'mysql': }
+  include mysql
   class { 'mysql::server':
     config_hash => { 'root_password' => $mysql_root_pw }
   }
   class { 'mysql::ruby':
-    package_provider => $dashboard::params::mysql_package_provider,
-    package_name     => $dashboard::params::ruby_mysql_package,
+    package_provider => $mysql_package_provider,
+    package_name     => $ruby_mysql_package,
   }
 
   if $passenger {
@@ -83,10 +116,11 @@ class dashboard (
     -> Class['dashboard::passenger']
 
     class { 'dashboard::passenger':
-      dashboard_site => $dashboard_site,
-      dashboard_port => $dashboard_port,
+      dashboard_site   => $dashboard_site,
+      dashboard_port   => $dashboard_port,
+      dashboard_config => $dashboard_config,
+      dashboard_root   => $dashboard_root,
     }
-
   } else {
     Class['mysql']
     -> Class['mysql::ruby']
@@ -118,7 +152,20 @@ class dashboard (
   }
 
   package { $dashboard_package:
-    ensure => $dashboard_version,
+    ensure  => $dashboard_version,
+    require => [ Package['rdoc'], Package['rack'] ],
+  }
+
+  # Currently, the dashboard requires this specific version
+  #  of the rack gem. Using the gem provider by default.
+  package { 'rack':
+    ensure   => $rack_version,
+    provider => 'gem',
+  }
+
+  package { ['rake', 'rdoc']:
+    ensure   => present,
+    provider => 'gem',
   }
 
   File {
@@ -182,6 +229,5 @@ class dashboard (
   group { $dashboard_group:
       ensure => 'present',
   }
-
 }
 
