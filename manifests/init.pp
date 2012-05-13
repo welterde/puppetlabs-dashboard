@@ -96,7 +96,7 @@ class dashboard (
   $rack_version             = $dashboard::params::rack_version
 ) inherits dashboard::params {
 
-  include mysql
+  require mysql
   class { 'mysql::server':
     config_hash => { 'root_password' => $mysql_root_pw }
   }
@@ -106,15 +106,6 @@ class dashboard (
   }
 
   if $passenger {
-    Class['mysql']
-    -> Class['mysql::ruby']
-    -> Class['mysql::server']
-    -> Package[$dashboard_package]
-    -> Mysql::DB[$dashboard_db]
-    -> File["${dashboard::params::dashboard_root}/config/database.yml"]
-    -> Exec['db-migrate']
-    -> Class['dashboard::passenger']
-
     class { 'dashboard::passenger':
       dashboard_site   => $dashboard_site,
       dashboard_port   => $dashboard_port,
@@ -122,15 +113,6 @@ class dashboard (
       dashboard_root   => $dashboard_root,
     }
   } else {
-    Class['mysql']
-    -> Class['mysql::ruby']
-    -> Class['mysql::server']
-    -> Package[$dashboard_package]
-    -> Mysql::DB[$dashboard_db]
-    -> File["${dashboard::params::dashboard_root}/config/database.yml"]
-    -> Exec['db-migrate']
-    -> Service[$dashboard_service]
-
     file { 'dashboard_config':
       ensure  => present,
       path    => $dashboard_config,
@@ -138,8 +120,7 @@ class dashboard (
       owner   => '0',
       group   => '0',
       mode    => '0644',
-      require => [ Package[$dashboard_package], User[$dashboard_user] ],
-      before  => Service[$dashboard_service],
+      require => Package[$dashboard_package],
     }
 
     service { $dashboard_service:
@@ -153,7 +134,7 @@ class dashboard (
 
   package { $dashboard_package:
     ensure  => $dashboard_version,
-    require => [ Package['rdoc'], Package['rack'] ],
+    require => [ Package['rdoc'], Package['rack']],
   }
 
   # Currently, the dashboard requires this specific version
@@ -169,10 +150,10 @@ class dashboard (
   }
 
   File {
-    require => Package[$dashboard_package],
     mode    => '0755',
     owner   => $dashboard_user,
     group   => $dashboard_group,
+    require => Package[$dashboard_package],
   }
 
   file { [ "${dashboard::params::dashboard_root}/public", "${dashboard::params::dashboard_root}/tmp", "${dashboard::params::dashboard_root}/log", '/etc/puppet-dashboard' ]:
@@ -205,10 +186,12 @@ class dashboard (
   }
 
   exec { 'db-migrate':
-    command   => 'rake RAILS_ENV=production db:migrate',
-    cwd       => $dashboard::params::dashboard_root,
-    path      => '/usr/bin/:/usr/local/bin/',
-    creates   => "/var/lib/mysql/${dashboard_db}/nodes.frm",
+    command => 'rake RAILS_ENV=production db:migrate',
+    cwd     => $dashboard::params::dashboard_root,
+    path    => '/usr/bin/:/usr/local/bin/',
+    creates => "/var/lib/mysql/${dashboard_db}/nodes.frm",
+    require => [Package[$dashboard_package], Mysql::Db[$dashboard_db],
+                File["${dashboard::params::dashboard_root}/config/database.yml"]],
   }
 
   mysql::db { $dashboard_db:
