@@ -28,8 +28,8 @@ class dashboard::passenger (
   $dashboard_root
 ) inherits dashboard {
 
+  require ::passenger
   include apache
-  include passenger
 
   file { '/etc/init.d/puppet-dashboard':
     ensure => absent,
@@ -46,5 +46,4 @@ class dashboard::passenger (
     docroot  => "${dashboard_root}/public",
     template => 'dashboard/passenger-vhost.erb',
   }
-
 }
