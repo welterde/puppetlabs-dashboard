@@ -36,13 +36,6 @@
 #     - Boolean to determine whether Dashboard is to be
 #       used with Passenger
 #
-#   [*mysql_package_provider*]
-#     - The package provider to use when installing
-#       the ruby-mysql package
-#
-#   [*ruby_mysql_package*]
-#     - The package name for the ruby-mysql package
-#
 #   [*dashboard_config*]
 #     - The Dashboard configuration file
 #
@@ -59,7 +52,6 @@
 #
 # Requires:
 # Class['mysql']
-# Class['mysql::ruby']
 # Class['mysql::server']
 # Apache::Vhost[$dashboard_site]
 #
@@ -92,8 +84,6 @@ class dashboard (
   $dashboard_config         = $dashboard::params::dashboard_config,
   $mysql_root_pw            = $dashboard::params::mysql_root_pw,
   $passenger                = $dashboard::params::passenger,
-  $mysql_package_provider   = $dashboard::params::mysql_package_provider,
-  $ruby_mysql_package       = $dashboard::params::ruby_mysql_package,
   $dashboard_config         = $dashboard::params::dashboard_config,
   $dashboard_root           = $dashboard::params::dashboard_root,
   $rails_base_uri           = $dashboard::params::rails_base_uri,
@@ -101,12 +91,10 @@ class dashboard (
 ) inherits dashboard::params {
 
   require mysql
+  include mysql::bindings::ruby
+
   class { 'mysql::server':
     config_hash => { 'root_password' => $mysql_root_pw }
-  }
-  class { 'mysql::ruby':
-    package_provider => $mysql_package_provider,
-    package_name     => $ruby_mysql_package,
   }
 
   if $passenger {

@@ -33,8 +33,6 @@ class dashboard::params {
       $dashboard_service      = ['puppet-dashboard','puppet-dashboard-workers']
       $dashboard_package      = 'puppet-dashboard'
       $dashboard_root         = '/usr/share/puppet-dashboard'
-      $mysql_package_provider = 'yum'
-      $ruby_mysql_package     = 'ruby-mysql'
     }
 
     'Debian': {
@@ -42,8 +40,6 @@ class dashboard::params {
       $dashboard_service      = 'puppet-dashboard'
       $dashboard_package      = 'puppet-dashboard'
       $dashboard_root         = '/usr/share/puppet-dashboard'
-      $mysql_package_provider = 'aptitude'
-      $ruby_mysql_package     = 'libmysql-ruby1.8'
     }
 
     default: {
