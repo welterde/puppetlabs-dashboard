@@ -1,6 +1,6 @@
-Listen <%= dashboard_port %>
+Listen <%= @dashboard_port %>
 
-<VirtualHost *:<%= dashboard_port %>>
+<VirtualHost *:<%= @dashboard_port %>>
   ServerName <%= name %>
   DocumentRoot <%= docroot %>
   RailsBaseURI <%= rails_base_uri %>

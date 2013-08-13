@@ -168,7 +168,7 @@ class dashboard (
   }
 
   file { "${dashboard::params::dashboard_root}/config/database.yml":
-    ensure => 'symlink',
+    ensure => 'link',
     target => '/etc/puppet-dashboard/database.yml',
   }
 
