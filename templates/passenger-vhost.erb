@@ -1,4 +1,6 @@
+<% if @dashboard_port != '80' -%>
 Listen <%= @dashboard_port %>
+<% end -%>
 
 <VirtualHost *:<%= @dashboard_port %>>
   ServerName <%= name %>
