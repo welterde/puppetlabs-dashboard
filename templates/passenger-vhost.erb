@@ -5,7 +5,7 @@ Listen <%= @dashboard_port %>
 <VirtualHost *:<%= @dashboard_port %>>
   ServerName <%= name %>
   DocumentRoot <%= docroot %>
-  RailsBaseURI <%= rails_base_uri %>
+  RailsBaseURI <%= @rails_base_uri %>
   <Directory <%= docroot %>>
     Options None
     AllowOverride AuthConfig
