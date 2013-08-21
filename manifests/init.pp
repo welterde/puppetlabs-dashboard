@@ -49,6 +49,9 @@
 #   [*dashboard_root*]
 #     - The path to the Puppet Dashboard library
 #
+#   [*rails_base_uri*]
+#     - The base URI for the application
+#
 #   [*rack_version*]
 #     - The version of the rack gem to install
 #
@@ -93,6 +96,7 @@ class dashboard (
   $ruby_mysql_package       = $dashboard::params::ruby_mysql_package,
   $dashboard_config         = $dashboard::params::dashboard_config,
   $dashboard_root           = $dashboard::params::dashboard_root,
+  $rails_base_uri           = $dashboard::params::rails_base_uri,
   $rack_version             = $dashboard::params::rack_version
 ) inherits dashboard::params {
 
@@ -111,6 +115,7 @@ class dashboard (
       dashboard_port   => $dashboard_port,
       dashboard_config => $dashboard_config,
       dashboard_root   => $dashboard_root,
+      rails_base_uri   => $rails_base_uri,
     }
   } else {
     file { 'dashboard_config':

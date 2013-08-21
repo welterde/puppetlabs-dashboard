@@ -15,6 +15,9 @@
 #   [*dashboard_root*]
 #     - The path to the Puppet Dashboard library
 #
+#   [*rails_base_uri*]
+#     - The base URI for the application
+#
 # Actions:
 #
 # Requires:
@@ -25,7 +28,8 @@ class dashboard::passenger (
   $dashboard_site,
   $dashboard_port,
   $dashboard_config,
-  $dashboard_root
+  $dashboard_root,
+  $rails_base_uri,
 ) inherits dashboard {
 
   require ::passenger
