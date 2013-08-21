@@ -20,6 +20,9 @@
 #   [*dashboard_db*]
 #     - The puppet-dashboard database name
 #
+#   [*dashboard_environment*]
+#     - The environment (production, test) to use.
+#
 #   [*dashboard_charset*]
 #     - Character set for the puppet-dashboard database
 #
@@ -67,6 +70,7 @@
 #     dashboard_group        => 'puppet-dbgroup',
 #     dashboard_password     => 'changemme',
 #     dashboard_db           => 'dashboard_prod',
+#     dashboard_environment  => 'production',
 #     dashboard_charset      => 'utf8',
 #     dashboard_site         => $fqdn,
 #     dashboard_port         => '8080',
@@ -83,6 +87,7 @@ class dashboard (
   $dashboard_group          = $dashboard::params::dashboard_group,
   $dashboard_password       = $dashboard::params::dashboard_password,
   $dashboard_db             = $dashboard::params::dashboard_db,
+  $dashboard_environment    = $dashboard::params::dashboard_environment,
   $dashboard_charset        = $dashboard::params::dashboard_charset,
   $dashboard_site           = $dashboard::params::dashboard_site,
   $dashboard_port           = $dashboard::params::dashboard_port,
