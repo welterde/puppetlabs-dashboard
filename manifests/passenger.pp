@@ -45,9 +45,15 @@ class dashboard::passenger (
   }
 
   apache::vhost { $dashboard_site:
-    port     => $dashboard_port,
-    priority => '50',
-    docroot  => "${dashboard_root}/public",
-    template => 'dashboard/passenger-vhost.erb',
-  }
+    port              => $dashboard_port,
+    priority          => '50',
+    docroot           => "${dashboard_root}/public",
+    servername        => $dashboard_site,
+    options           => 'None',
+    override          => 'AuthConfig',
+    error_log         => true,
+    access_log        => true,
+    access_log_format => 'combined',
+    custom_fragment   => "RailsBaseURI ${rails_base_uri}",
+  } 
 }

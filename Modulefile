@@ -9,5 +9,5 @@ project_page 'https://github.com/puppetlabs/puppetlabs-dashboard'
 
 ## Add dependencies, if any:
 dependency 'puppetlabs/mysql', '>= 0.9.0'
-dependency 'puppetlabs/apache', '>= 0.0.4'
+dependency 'puppetlabs/apache', '>= 0.7.0'
 dependency 'puppetlabs/passenger', '>= 0.0.2'
