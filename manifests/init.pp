@@ -95,11 +95,12 @@ class dashboard (
   $rack_version             = $dashboard::params::rack_version
 ) inherits dashboard::params {
 
-  require mysql
-  include mysql::bindings::ruby
-
   class { 'mysql::server':
-    config_hash => { 'root_password' => $mysql_root_pw }
+    root_password => $mysql_root_pw,
+  }
+
+  class { 'mysql::bindings':
+    ruby_enable => true,
   }
 
   if $passenger {
