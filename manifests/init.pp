@@ -158,7 +158,7 @@ class dashboard (
   }
 
   File {
-    mode    => '0755',
+    mode    => '0644',
     owner   => $dashboard_user,
     group   => $dashboard_group,
     require => Package[$dashboard_package],
