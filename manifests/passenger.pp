@@ -38,8 +38,8 @@ class dashboard::passenger (
 
   if $passenger_install {
     require ::passenger
+    include apache
   }
-  include apache
 
   file { '/etc/init.d/puppet-dashboard':
     ensure => absent,
