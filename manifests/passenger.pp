@@ -41,13 +41,9 @@ class dashboard::passenger (
     include apache
   }
 
-  file { '/etc/init.d/puppet-dashboard':
-    ensure => absent,
-  }
-
-  file { 'dashboard_config':
-    ensure => absent,
-    path   => $dashboard_config,
+  service { 'puppet-dashboard':
+    ensure => stopped,
+    enable => false, # shouldn't get started then
   }
 
   apache::vhost { $dashboard_site:
