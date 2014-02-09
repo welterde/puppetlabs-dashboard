@@ -121,17 +121,36 @@ class dashboard (
       passenger_install => $passenger_install,
     }
   } else {
-    file { 'dashboard_config':
-      ensure  => present,
-      path    => $dashboard_config,
-      content => template("dashboard/config.${::osfamily}.erb"),
-      owner   => '0',
-      group   => '0',
-      mode    => '0644',
+    service { $dashboard_service:
+      ensure     => running,
+      enable     => true,
+      hasrestart => true,
+      subscribe  => File['/etc/puppet-dashboard/database.yml'],
+      require    => Exec['db-migrate']
+    }
+  }
+
+  file { 'dashboard_config':
+    ensure  => present,
+    path    => $dashboard_config,
+    content => template("dashboard/config.${::osfamily}.erb"),
+    owner   => '0',
+    group   => '0',
+    mode    => '0644',
+    require => Package[$dashboard_package],
+  }
+
+  if $::osfamily == 'Debian' {
+    file { 'dashboard_workers_config':
+      ensure => present,
+      path => "/etc/default/puppet-dashboard-workers",
+      content => template("dashboard/worker.Debian.erb"),
+      owner => '0',
+      group => '0',
+      mode => '0644',
       require => Package[$dashboard_package],
     }
-
-    service { $dashboard_service:
+    service { 'puppet-dashboard-workers':
       ensure     => running,
       enable     => true,
       hasrestart => true,
